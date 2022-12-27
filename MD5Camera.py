@@ -20,8 +20,8 @@ bl_info = {
     "name": "idTech 4 MD5Camera Exporter",
     "author": "MCampagnini",
     "version": ( 1, 0, 1 ),
-    "blender": ( 2, 6, 4 ),
-    "api": 36079,
+    "blender": ( 3, 4, 0 ),
+    #"api": 36079,
     "location": "File > Export > My Addon",
     "description": "Converts a Blender scene into an md5camera format",
     "warning": "",
@@ -238,9 +238,9 @@ class cCamera:
 from bpy_extras.io_utils import ExportHelper
 from bpy.props import StringProperty, BoolProperty, FloatProperty, IntProperty, EnumProperty
 
-class Export( bpy.types.Operator, ExportHelper ):
+class ExportMD5Cam( bpy.types.Operator, ExportHelper ):
     bl_idname = "export.md5camera"
-    bl_label = "Export"
+    bl_label = "ExportMD5Cam"
     __doc__ = "MD5 Camera Exporter (.md5camera)"
     filename_ext = ".md5camera"
     filter_glob = StringProperty( default = "*.md5camera", options = {'HIDDEN'} )
@@ -250,45 +250,45 @@ class Export( bpy.types.Operator, ExportHelper ):
     #fps = bpy.context.scene.fps    
     fps = 30
 
-    filepath = StringProperty(
+    filepath: StringProperty(
         name = "File Path",
         description = "Export path",
         maxlen = 1024,
         default = "" )
 
-    option_scale = FloatProperty(
+    option_scale: FloatProperty(
         name = "Scale",
         description = "Scale camera position",
         default = 1,
         min = 0.1,
         max = 1000 )
 
-    option_keyframeall = BoolProperty(
+    option_keyframeall: BoolProperty(
         name = "Keyframe All",
         description = "Keyframe every frame",
         default = False )
 
-    option_invertx = BoolProperty(
+    option_invertx: BoolProperty(
         name = "Invert X",
         description = "Invert X",
         default = True )
 
-    option_inverty = BoolProperty(
+    option_inverty: BoolProperty(
         name = "Invert Y",
         description = "Invert Y",
         default = True )
 
-    option_invertz = BoolProperty(
+    option_invertz: BoolProperty(
         name = "Invert Z",
         description = "Invert Z",
         default = True )
 
-    option_usepath = BoolProperty(
+    option_usepath: BoolProperty(
         name = "Use Path Constraint",
         description = "Using path as a constraint",
         default = False )
 
-    option_fps = IntProperty(
+    option_fps: IntProperty(
         name = "FPS",
         description = "Frames per second",
         min = 1,
@@ -297,18 +297,18 @@ class Export( bpy.types.Operator, ExportHelper ):
         soft_max = 100,
         default = fps )
 
-    option_commandline = StringProperty(
+    option_commandline: StringProperty(
         name = "",
         description = "Parameters passed to the exportmodels console command",
         maxlen = 1024,
         default = "" )
 
-    option_rotation = EnumProperty(
+    option_rotation: EnumProperty(
         items = [( 'QUATERNION', 'QUATERNION', 'QUATERNION' ),
                  ( 'EULER', 'EULER', 'EULER' )],
         name = "" )
 
-    option_unit = EnumProperty(
+    option_unit: EnumProperty(
         items = [( 'RADIANS', 'RADIANS', 'RADIANS' ),
                  ( 'DEGREES', 'DEGREES', 'DEGREES' )],
         name = "Unit" )
@@ -316,15 +316,15 @@ class Export( bpy.types.Operator, ExportHelper ):
     def draw( self, context ):
         layout = self.layout
         box = layout.box()
-        box.label( 'General:' )
+        box.label( text = "General:" )
         box.prop( self, 'option_fps' )
         box.prop( self, 'option_scale' )
         box.prop( self, 'option_unit' )
         box.prop( self, 'option_keyframeall' )
         box.prop( self, 'option_usepath' )
-        box.label( 'Command Line:' )
+        box.label( text = "Command Line:" )
         box.prop( self, 'option_commandline' )
-        box.label( 'Rotation:' )
+        box.label( text = "Rotation:" )
         box.prop( self, 'option_rotation' )
         box.prop( self, 'option_invertx' )
         box.prop( self, 'option_inverty' )
@@ -351,7 +351,7 @@ class Export( bpy.types.Operator, ExportHelper ):
 
     def execute( self, context ):
         print( 'MCampagnini MD5Camera Exporter\n' )
-        start = time.clock()
+        start = time.process_time()
         # Declare globals
         global optionCommandLine
         global optionFPS
@@ -396,7 +396,7 @@ class Export( bpy.types.Operator, ExportHelper ):
 
         self.write( self.filepath, model )
 
-        lapse = ( time.clock() - start )
+        lapse = ( time.process_time() - start )
         print( 'Completed in ' + str( lapse ) + ' seconds' )
 
         return {'FINISHED'}
@@ -418,15 +418,15 @@ def get_camera():
         return camera
 
 def menu_func( self, context ):
-    self.layout.operator( Export.bl_idname, text = "idTech 4 MD5Camera Export", icon='BLENDER' )
+    self.layout.operator( ExportMD5Cam.bl_idname, text = "idTech 4 MD5Camera Export", icon='BLENDER' )
 
 def register():
-    bpy.utils.register_class( Export )
-    bpy.types.INFO_MT_file_export.append( menu_func )
+    bpy.utils.register_class( ExportMD5Cam )
+    bpy.types.TOPBAR_MT_file_export.append( menu_func )
 
 def unregister():
-    bpy.utils.unregister_class( Export )
-    bpy.types.INFO_MT_file_export.remove( menu_func )
+    bpy.utils.unregister_class( ExportMD5Cam )
+    bpy.types.TOPBAR_MT_file_export.remove( menu_func )
 
 if __name__ == "__main__":
     register()
